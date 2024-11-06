@@ -4,7 +4,7 @@ module DuckDB
     // Generated with c2chapel version 0.1.0
 
     // Header given to c2chapel:
-    require "/usr/local/lib/duckdb.h";
+    require "duckdb.h";
     require "-lduckdb";
     // Note: Generated with fake std headers
 

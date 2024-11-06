@@ -4,8 +4,9 @@ Status: some initial testing of using the DuckDB C api in Chapel.
 
 Compiling with
 ```bash
-chpl -o bin/duckdbtest --ccflags -Wno-strict-prototypes duckdbtest.chpl
+chpl -o bin/duckdbtest --ccflags -Wno-strict-prototypes -I/usr/local/lib duckdbtest.chpl
 ```
+Can't seem to get the linker to find the path without the -I flag. A problem for later.
 
 ## User story
 
