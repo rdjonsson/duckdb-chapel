@@ -1,79 +1,49 @@
-use IO;
 use DuckDB;
-use CTypes;
 
-var db: duckdb_database;
-var inMemory: c_ptrConst(c_char);
-var con: duckdb_connection;
-var state: duckdb_state;
-var res: duckdb_result;
+record Agent {
+  var AgentId: int;
+  var HouseholdId: int;
+  var BirthYear: int;
+}
+
+proc main() throws {
+  var db = openDatabase(":memory:");
+  var conn = connect(db);
+
+  // Create and populate test table
+  conn.execute("CREATE TABLE agents (id INTEGER, hh_id INTEGER, year INTEGER)");
+  conn.execute("INSERT INTO agents VALUES (1, 100, 1985)");
+  conn.execute("INSERT INTO agents VALUES (2, 100, 1987)");
+  conn.execute("INSERT INTO agents VALUES (3, 101, 1990)");
+
+  // Usage 1: Fetch into array of records, columns matched by order
+  writeln("Fetch into array - columns must be in same order as record fields");
+  var agents1 = conn.fetchAll(Agent, 
+    "SELECT id, hh_id, year FROM agents ORDER BY id");
+
+  for agent in agents1 {
+    writeln("Agent ", agent.AgentId, 
+            " in household ", agent.HouseholdId,
+            " born ", agent.BirthYear);
+  }
+
+  // Usage 2: Fetch into array of records, columns matched by mapping
+  writeln("Fetch into array - columns matched by mapping");
+
+  // Define mapping: (sql_column_name, record_field_name)
+  var mapping: [0..2] (string, string) = [
+    ("id", "AgentId"),
+    ("hh_id", "HouseholdId"),
+    ("year", "BirthYear")
+  ];
+
+  var agents2 = conn.fetchAllMapped(Agent,
+    "SELECT id, year, hh_id FROM agents ORDER BY id",
+    mapping);
+
+  for agent in agents2 {
+    writeln(agent);
+  }
 
 
-var open_response = duckdb_open(nil, db);
-
-
-var connect_response = duckdb_connect(db, con);
-
-
-state = duckdb_query(con, "select emp from '/home/danjo/scenarios/ume/scaper/landuse.csv';", res);
-
-do {
-
-    var result = duckdb_fetch_chunk(res);
-    
-    var row_count = duckdb_data_chunk_get_size(result);
-    
-    if row_count == 0 then break;
-    writeln("Row count ", row_count);
-    
-    var col1 = duckdb_data_chunk_get_vector(result, 0);
-    var ctype = duckdb_vector_get_column_type(col1);
-    var typeid = duckdb_get_type_id(ctype);
-    if typeid == DUCKDB_TYPE_INTEGER {
-
-        writeln(typeid);
-        var col1_data = duckdb_vector_get_data(col1):c_ptr(int(32));
-        var col1_validity = duckdb_vector_get_validity(col1);
-        for row in 0..<row_count {
-            if duckdb_validity_row_is_valid(col1_validity, row) {
-                writeln(col1_data[row]:int);
-            } else {
-                writeln("NULL");
-            }
-            writeln("\n");
-        }
-    }
-    if typeid == DUCKDB_TYPE_FLOAT {
-
-        writeln(typeid);
-        var col1_data = duckdb_vector_get_data(col1):c_ptr(c_float);
-        var col1_validity = duckdb_vector_get_validity(col1);
-        for row in 0..<row_count {
-            if duckdb_validity_row_is_valid(col1_validity, row) {
-                writeln(col1_data[row]:c_float);
-            } else {
-                writeln("NULL");
-            }
-            writeln("\n");
-        }
-    }
-    if typeid == DUCKDB_TYPE_DOUBLE {
-
-        writeln(typeid);
-        var col1_data = duckdb_vector_get_data(col1):c_ptr(c_double);
-        var col1_validity = duckdb_vector_get_validity(col1);
-        for row in 0..<row_count {
-            if duckdb_validity_row_is_valid(col1_validity, row) {
-                writeln(col1_data[row]:c_double);
-            } else {
-                writeln("NULL");
-            }
-        }
-    }
-
-    duckdb_destroy_data_chunk(result);
-
-} while true;
-
-duckdb_disconnect(con);
-duckdb_close(db);
+}
