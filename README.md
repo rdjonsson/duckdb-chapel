@@ -2,13 +2,8 @@
 
 Status: some initial testing of using the DuckDB C api in Chapel.
 
-Status update (Feb 2026): Read into records. Vibe coded using Claude Opus, via Kagi Assistant.
+Status update (Feb 2026): Read into records. Vibe coded using Claude Opus, via Kagi Assistant. Also included a simple dataframe type to alternatively return typed and named columns from a table.
 
-Compiling with
-```bash
-chpl -o bin/duckdbtest --ccflags -Wno-strict-prototypes -I/usr/local/lib duckdbtest.chpl
-```
-Can't seem to get the linker to find the path without the -I flag. A problem for later.
 
 ## User story
 
@@ -16,7 +11,7 @@ I'd eventually like something like this to work:
 
 - A command to open and connect to a database either in-memory or on file. **[done]**
 - A simple command to send queries to the database **[done]**
-- A command to run a query against the database and use the columns from the query as vectors and domains connected to the vector. See data example below.
+- A command to run a query against the database and use the columns from the query as vectors and domains connected to the vector. See data example below. **[partly done]**
 
 Example data:
 
@@ -28,7 +23,6 @@ Example data:
 | 0   | 1   | 5     |
 | 1   | 1   | 7     |
 
-My use case changed a bit so I vibe coded a new version. It does the first two points above, but instead of reading the columns it reads each row into a record. I still need the columns to array reader as well, but that will have to be added later.
 
 Usage example
 
