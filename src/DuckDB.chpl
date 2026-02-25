@@ -1,5 +1,6 @@
 module DuckDB {
-  public use DuckDBCAPI;
+  include module DuckDBCAPI;
+  use DuckDBCAPI;
   use CTypes;
   use Reflection;
   use Map;
