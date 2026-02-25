@@ -3,6 +3,7 @@ module DuckDBCAPI {
 
   // Ensure duckdb.h is included during C compilation
   require "duckdb.h";
+  require "-lduckdb";
 
   // ============================================
   // Opaque Handle Types

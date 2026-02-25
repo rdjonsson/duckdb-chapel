@@ -273,12 +273,13 @@ module DuckDB {
       return duckdb_row_count(this._result): int;
     }
 
-    proc ref columnName(col: int): string {
+    proc ref columnName(col: int): string throws {
       var cstr = duckdb_column_name(this._result, col: idx_t);
+      if cstr == nil then throw new DuckDBException("Failed to get column name");
       return string.createCopyingBuffer(cstr);
     }
 
-    proc ref getColumnMap(): map(string, int) {
+    proc ref getColumnMap(): map(string, int) throws {
       var colMap: map(string, int);
       for col in 0..<columnCount() {
         colMap[columnName(col)] = col;
@@ -422,7 +423,7 @@ module DuckDB {
   // Append a typed value from a vector into a column
   private proc appendValueFromVector(ref col: DuckDBColumn,
                                       dataPtr: c_ptr(void),
-                                      row: int) {
+                                      row: int) throws {
     select col.dtype {
       when ColumnType.BOOL {
         col.boolValues.pushBack(
@@ -477,7 +478,7 @@ module DuckDB {
   private proc populateFromChunkByPosition(ref rec: ?T,
                                             chunk: duckdb_data_chunk,
                                             localRow: int) throws {
-    param numFields = Reflection.numFields(T);
+    param numFields = Reflection.getNumFields(T);
     for param fieldIdx in 0..<numFields {
       const col = fieldIdx;
       var vector   = duckdb_data_chunk_get_vector(chunk, col: idx_t);
@@ -496,8 +497,8 @@ module DuckDB {
   private proc populateFromChunkByName(ref rec: ?T,
                                         chunk: duckdb_data_chunk,
                                         localRow: int,
-                                        fieldToCol: map(string, int)) {
-    param numFields = Reflection.numFields(T);
+                                        fieldToCol: map(string, int)) throws {
+    param numFields = Reflection.getNumFields(T);
     for param fieldIdx in 0..<numFields {
       param fieldName = Reflection.getFieldName(T, fieldIdx);
 

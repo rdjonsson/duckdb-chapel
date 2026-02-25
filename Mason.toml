@@ -7,3 +7,6 @@ type="library"
 
 [dependencies]
 
+[examples.duckdbExample]
+
+[examples.columnExample]
