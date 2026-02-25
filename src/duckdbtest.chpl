@@ -6,7 +6,7 @@ record Agent {
   var BirthYear: int;
 }
 
-proc main() throws {
+  proc main() throws {
   var db = openDatabase(":memory:");
   var conn = connect(db);
 
