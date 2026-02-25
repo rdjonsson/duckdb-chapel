@@ -476,7 +476,7 @@ module DuckDB {
 
   private proc populateFromChunkByPosition(ref rec: ?T,
                                             chunk: duckdb_data_chunk,
-                                            localRow: int) {
+                                            localRow: int) throws {
     param numFields = Reflection.numFields(T);
     for param fieldIdx in 0..<numFields {
       const col = fieldIdx;
@@ -522,7 +522,7 @@ module DuckDB {
   // ============================================
 
   private proc setFieldFromVector(ref rec: ?T, param fieldIdx: int,
-                                   dataPtr: c_ptr(void), localRow: int) {
+                                   dataPtr: c_ptr(void), localRow: int) throws{
     ref field = Reflection.getFieldRef(rec, fieldIdx);
     type FT = field.type;
 
@@ -558,7 +558,7 @@ module DuckDB {
   // ============================================
 
   private proc extractDuckDBString(dataPtr: c_ptr(void),
-                                    row: int): string {
+                                    row: int): string throws {
     const STRING_T_SIZE = 16;
     const INLINE_LIMIT  = 12;
 
