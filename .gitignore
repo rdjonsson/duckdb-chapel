@@ -1,1 +1,3 @@
-**/bin
+target/
+Mason.lock
+doc/
