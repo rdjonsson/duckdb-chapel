@@ -1,4 +1,4 @@
-use DuckDB;
+use DuckDBChapel;
 
 proc main() throws {
   var db = openDatabase(":memory:");

@@ -1,4 +1,4 @@
-use DuckDB;
+use DuckDBChapel;
 
 record Agent {
   var AgentId: int;

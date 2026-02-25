@@ -1,4 +1,4 @@
-module DuckDB {
+module DuckDBChapel {
   include module DuckDBCAPI;
   use DuckDBCAPI;
   use CTypes;
