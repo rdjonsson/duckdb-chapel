@@ -559,7 +559,7 @@ module DuckDBChapel {
   // ============================================
 
 private proc extractDuckDBString(dataPtr: c_ptr(void),
-                                  row: int): string {
+                                  row: int): string throws {
   const STRING_T_SIZE = 16;
   const INLINE_LIMIT  = 12;
 
