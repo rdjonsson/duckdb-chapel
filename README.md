@@ -27,6 +27,8 @@ Example data:
 Usage example
 
 ```chapel
+use DuckDBAPI;
+
 record Agent {
   var AgentId: int;
   var HouseholdId: int;

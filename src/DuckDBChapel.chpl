@@ -558,25 +558,31 @@ module DuckDBChapel {
   //     bytes 8..15 : char* to heap data
   // ============================================
 
-  private proc extractDuckDBString(dataPtr: c_ptr(void),
-                                    row: int): string throws {
-    const STRING_T_SIZE = 16;
-    const INLINE_LIMIT  = 12;
+private proc extractDuckDBString(dataPtr: c_ptr(void),
+                                  row: int): string {
+  const STRING_T_SIZE = 16;
+  const INLINE_LIMIT  = 12;
 
-    var base   = (dataPtr: c_ptr(uint(8))) + (row * STRING_T_SIZE);
-    var length = (base: c_ptr(uint(32))).deref();
+  // Byte pointer for offset arithmetic
+  var base   = (dataPtr: c_ptr(uint(8))) + (row * STRING_T_SIZE);
 
-    if length == 0 then return "";
+  // Read length (uint32) — cast through void
+  var length = (base: c_ptr(void): c_ptr(uint(32))).deref();
 
-    var srcPtr: c_ptrConst(c_char);
-    if length <= INLINE_LIMIT: uint(32) {
-      srcPtr = (base + 4): c_ptrConst(c_char);
-    } else {
-      srcPtr = ((base + 8): c_ptr(c_ptrConst(c_char))).deref();
-    }
+  if length == 0 then return "";
 
-    return string.createCopyingBuffer(srcPtr, length = length: int);
+  var srcPtr: c_ptrConst(c_char);
+  if length <= INLINE_LIMIT: uint(32) {
+    // Inlined: data starts at offset 4 — cast through void
+    srcPtr = (base + 4): c_ptr(void): c_ptrConst(c_char);
+  } else {
+    // Pointer-based: an 8-byte pointer sits at offset 8 — cast through void
+    srcPtr = ((base + 8): c_ptr(void): c_ptr(c_ptrConst(c_char))).deref();
   }
+
+  return string.createCopyingBuffer(srcPtr, length = length: int);
+}
+
 
   // ============================================
   // Query execution factory
